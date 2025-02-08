@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Home from "./components/Home";
-import Login from "./components/Login";
-import Signup from "./components/Signup";
+import Login from "./components/LogIn";
+import Auth from "./components/Auth";
 import Navbar from "./components/Navbar";
+import './App.css';
 
 function App() {
   const routes = createBrowserRouter([
@@ -20,8 +21,8 @@ function App() {
       element: <Login />,
     },
     {
-      path: "/signup",
-      element: <Signup />,
+      path: "/auth",
+      element: <Auth />,
     },
   ]);
   return (
