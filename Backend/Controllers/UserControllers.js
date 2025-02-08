@@ -68,3 +68,5 @@ const registerproperty = async (req,res) =>{
     }
 
 };
+
+module.exports = { getholdings, allholdings, registerproperty };

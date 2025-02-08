@@ -1,141 +1,562 @@
-import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { ethers } from 'ethers';
+import axios from 'axios';
 
-export default function CrazyForm() {
+const LandRegistrationForm = () => {
   const [formData, setFormData] = useState({
-    name: "",
-    image: null,
-    address: "",
-    postalCode: "",
-    area: "",
-    dateofPurchase: "",
-    sale: false,
-    price: "",
-    ownerID: ""
+    name: '',
+    address: '',
+    postalCode: '',
+    area: '',
+    costPrice: '',
+    imageURL: ''
   });
+  const [loading, setLoading] = useState(false);
+  const [contract, setContract] = useState(null);
+  const [currentAccount, setCurrentAccount] = useState('');
+  const [networkError, setNetworkError] = useState('');
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
-    });
+  // Animation variants
+  const formVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5 }
+    },
+    exit: { opacity: 0, y: -20 }
   };
 
-  const handleImageChange = (e) => {
-    setFormData({
-      ...formData,
-      image: e.target.files[0],
-    });
+  const inputVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: (i) => ({
+      opacity: 1,
+      x: 0,
+      transition: { delay: i * 0.1, duration: 0.3 }
+    })
   };
 
-  const handleSubmit = (e) => {
+  // Smart Contract Configuration
+  const contractAddress = '0xB07D6f8750b48377bb261557Bbcd2b1A1f5Bb770';
+  const contractABI =  [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "landId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "price",
+          "type": "uint256"
+        }
+      ],
+      "name": "LandListedForSale",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "landId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "propertyAddress",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "dateOfPurchase",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "costPrice",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "totalLandArea",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "postalCode",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "propertyName",
+          "type": "string"
+        }
+      ],
+      "name": "LandRegistered",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "landId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "buyer",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "price",
+          "type": "uint256"
+        }
+      ],
+      "name": "LandSold",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "landId",
+          "type": "uint256"
+        }
+      ],
+      "name": "buyLand",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "landId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getLandDetails",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "isRegistered",
+          "type": "bool"
+        },
+        {
+          "internalType": "uint256",
+          "name": "price",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "isForSale",
+          "type": "bool"
+        },
+        {
+          "internalType": "string",
+          "name": "propertyAddress",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "dateOfPurchase",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "costPrice",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "totalLandArea",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "postalCode",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "propertyName",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "landCounter",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "lands",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "isRegistered",
+          "type": "bool"
+        },
+        {
+          "internalType": "uint256",
+          "name": "price",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "isForSale",
+          "type": "bool"
+        },
+        {
+          "internalType": "string",
+          "name": "propertyAddress",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "dateOfPurchase",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "costPrice",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "totalLandArea",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "postalCode",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "propertyName",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "landId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_price",
+          "type": "uint256"
+        }
+      ],
+      "name": "listLandForSale",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_propertyAddress",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_costPrice",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_totalLandArea",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_postalCode",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "_propertyName",
+          "type": "string"
+        }
+      ],
+      "name": "registerLand",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ];
+
+  // Check network
+  const checkNetwork = async () => {
+    try {
+      if (!window.ethereum) throw new Error('No Ethereum provider found');
+      
+      const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+      const sepoliaChainId = '0xaa36a7'; // Sepolia Testnet
+      
+      if (chainId !== sepoliaChainId) {
+        setNetworkError('Please connect to Sepolia Testnet');
+        return false;
+      }
+      setNetworkError('');
+      return true;
+    } catch (error) {
+      console.error('Network check failed:', error);
+      return false;
+    }
+  };
+
+  // Connect Wallet Function
+  const connectWallet = async () => {
+    try {
+      if (!window.ethereum) throw new Error('MetaMask not installed');
+      
+      const isCorrectNetwork = await checkNetwork();
+      if (!isCorrectNetwork) return;
+
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const accounts = await window.ethereum.request({ 
+        method: 'eth_requestAccounts' 
+      });
+      
+      const signer = await provider.getSigner();
+      const contractInstance = new ethers.Contract(
+        contractAddress,
+        contractABI,
+        signer
+      );
+      
+      setContract(contractInstance);
+      setCurrentAccount(accounts[0]);
+      return contractInstance;
+    } catch (error) {
+      console.error("Wallet connection failed:", error);
+      alert(`Error: ${error.message}`);
+    }
+  };
+
+  // Auto-connect wallet on component mount
+  useEffect(() => {
+    const initWallet = async () => {
+      if (window.ethereum) {
+        await checkNetwork();
+        try {
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          const accounts = await provider.listAccounts();
+          if (accounts.length > 0) {
+            const signer = await provider.getSigner();
+            setContract(new ethers.Contract(contractAddress, contractABI, signer));
+            setCurrentAccount(accounts[0].address);
+          }
+        } catch (error) {
+          console.log('Auto-connect error:', error);
+        }
+      }
+    };
+    initWallet();
+  }, []);
+
+  // Handle Form Submission
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitted Data:", formData);
+    if (!contract) {
+      alert('Please connect your wallet first');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Validate required fields
+      const requiredFields = ['name', 'address', 'postalCode', 'area', 'costPrice'];
+      if (requiredFields.some(field => !formData[field])) {
+        throw new Error('All required fields must be filled');
+      }
+
+      // Convert values
+      const costPriceWei = ethers.parseEther(formData.costPrice);
+      if (costPriceWei <= 0n) throw new Error('Cost price must be greater than 0 ETH');
+
+      // Smart contract interaction
+      const tx = await contract.registerLand(
+        formData.address,
+        costPriceWei,
+        formData.area,
+        formData.postalCode,
+        formData.name
+      );
+      
+      const receipt = await tx.wait();
+      const event = receipt.logs.find(log => 
+        contract.interface.parseLog(log)?.name === 'LandRegistered'
+      );
+      
+      if (!event) throw new Error('Land registration event not found');
+      
+      const landId = contract.interface.parseLog(event).args.landId.toString();
+
+      // Backend API call
+      await axios.post('/api/registerproperty', {
+        ...formData,
+        landId,
+        ownerID: currentAccount,
+        dateofPurchase: Math.floor(Date.now() / 1000)
+      });
+
+      // Reset form on success
+      setFormData({
+        name: '',
+        address: '',
+        postalCode: '',
+        area: '',
+        costPrice: '',
+        imageURL: ''
+      });
+      
+      alert('Property registered successfully!');
+    } catch (error) {
+      console.error('Registration failed:', error);
+      alert(`Error: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: -50 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="flex justify-center items-center min-h-screen bg-gradient-to-r from-teal-300 via-blue-500 to-purple-600"
+      variants={formVariants}
+      initial="hidden"
+      animate="visible"
+      className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-lg"
     >
-      <form
-        onSubmit={handleSubmit}
-        className="bg-amber-50 p-8 rounded-2xl shadow-lg max-w-lg w-full space-y-4"
-      >
-        <h2 className=" text-2xl font-bold text-center text-gray-800">Land Registration Form</h2>
-        <input
-          type="text"
-          name="name"
-          placeholder="Name"
-          onChange={handleChange}
-          className="input-style"
-          required
-        />
-        <input
-          type="file"
-          name="image"
-          onChange={handleImageChange}
-          className="input-style  border-zinc-500"
-          accept="image/*"
-        />
-        {formData.image && (
-          <div className="flex justify-center">
-            <img
-              src={URL.createObjectURL(formData.image)}
-              alt="Preview"
-              className="h-32 w-32 object-cover mt-4"
-            />
-          </div>
-        )}
-        <input
-          type="text"
-          name="address"
-          placeholder="Address"
-          onChange={handleChange}
-          className="input-style"
-          required
-        />
-        <input
-          type="number"
-          name="postalCode"
-          placeholder="Postal Code"
-          onChange={handleChange}
-          className="input-style"
-          required
-        />
-        <input
-          type="number"
-          name="area"
-          placeholder="Area (sq ft)"
-          onChange={handleChange}
-          className="input-style"
-          required
-        />
-        <input
-          type="date"
-          name="dateofPurchase"
-          onChange={handleChange}
-          className="input-style"
-          required
-        />
-        <input
-          type="number"
-          name="price"
-          placeholder="Price"
-          onChange={handleChange}
-          className="input-style"
-          required
-        />
-        <input
-          type="text"
-          name="ownerID"
-          placeholder="Owner ID"
-          onChange={handleChange}
-          className="input-style"
-        />
-
-        <div className="flex items-center justify-between">
-          <span className="text-gray-700">For Sale</span>
-          <input
-            type="checkbox"
-            checked={formData.sale}
-            onChange={() => setFormData({ ...formData, sale: !formData.sale })}
-            className="w-6 h-6 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-          />
+      <h1 className="text-2xl font-bold mb-4">Register New Property</h1>
+      {networkError && (
+        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
+          {networkError}
         </div>
-
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
+      )}
+      
+      <form onSubmit={handleSubmit}>
+        {[
+          { label: 'Property Name', name: 'name', type: 'text', required: true },
+          { label: 'Physical Address', name: 'address', type: 'text', required: true },
+          { label: 'Postal Code', name: 'postalCode', type: 'number', required: true },
+          { label: 'Land Area (sqm)', name: 'area', type: 'number', required: true },
+          { label: 'Cost Price (ETH)', name: 'costPrice', type: 'number', step: "0.01", required: true },
+          { label: 'Image URL', name: 'imageURL', type: 'url', required: false },
+        ].map((field, index) => (
+          <motion.div
+            key={index}
+            variants={inputVariants}
+            custom={index}
+            initial="hidden"
+            animate="visible"
+            className="mb-4"
+          >
+            <label className="block text-sm font-medium text-gray-700">
+              {field.label}
+            </label>
+            <input
+              value={formData[field.name]}
+              onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+              required={field.required}
+              type={field.type}
+              step={field.step}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+            />
+          </motion.div>
+        ))}
+        
+        <button
           type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
+          disabled={loading || !currentAccount}
+          className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 disabled:bg-gray-400 transition-colors"
         >
-          Submit
-        </motion.button>
+          {loading ? 'Registering...' : 'Register Property'}
+        </button>
+        
+        {!currentAccount && (
+          <button
+            type="button"
+            onClick={connectWallet}
+            className="w-full mt-4 bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors"
+          >
+            Connect MetaMask Wallet
+          </button>
+        )}
       </form>
     </motion.div>
   );
-}
+};
+
+export default LandRegistrationForm;

@@ -23,14 +23,16 @@ const Home = () => {
               buying, selling, and managing real estate. 
             </div>
             <div className="flex gap-10">
-              <NavLink to="/Auth">
-              <button className="text-lg bg-gradient-to-r from-green-400 to-blue-600 hover:from-green-500 hover:to-blue-700 text-white px-10 py-5 rounded-full shadow-lg transition-transform transform hover:scale-105">
-                Register land
-              </button>
+              <NavLink to="/Marketplace">
+                <button className="text-lg bg-gradient-to-r from-green-400 to-blue-600 hover:from-green-500 hover:to-blue-700 text-white px-10 py-5 rounded-full shadow-lg transition-transform transform hover:scale-105">
+                  Buy Land
+                </button>
               </NavLink>
-              <button className="text-lg bg-gradient-to-r from-green-400 to-blue-600 hover:from-green-500 hover:to-blue-700 text-white px-10 py-5 rounded-full shadow-lg transition-transform transform hover:scale-105">
-                Try Now
-              </button>
+              <NavLink to="/Auth">
+                <button className="text-lg bg-gradient-to-r from-green-400 to-blue-600 hover:from-green-500 hover:to-blue-700 text-white px-10 py-5 rounded-full shadow-lg transition-transform transform hover:scale-105">
+                  Resgister Land
+                </button>
+              </NavLink>
             </div>
           </div>
         </div>
