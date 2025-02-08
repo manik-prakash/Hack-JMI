@@ -91,7 +91,7 @@ const Dashboard = () => {
           {holdings.map((holding) => (
             <div 
               key={holding.id} 
-              className={`bg-white opacity-50 p-4 rounded-lg shadow-md transition-all duration-300 ${
+              className={`bg-gradient-to-br from-gray-800 to-gray-900 bg-opacity-70 p-6 rounded-2xl shadow-lg backdrop-blur-3xl border-2 border-gray-500 ${
                 expandedProperty === holding ? 'col-span-3' : ''
               }`}
               onClick={() => handlePropertyClick(holding)}
