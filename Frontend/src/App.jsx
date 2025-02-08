@@ -6,6 +6,8 @@ import Auth from "./components/Auth";
 import Navbar from "./components/Navbar";
 import LandRegister from "./components/LandRegister";
 import './App.css';
+import Dashboard from "./components/Dashboard";
+import NavbarDashboard from "./components/NavbarDashboard";
 
 function App() {
   const routes = createBrowserRouter([
@@ -29,6 +31,14 @@ function App() {
       path: "/landregister",
       element: <LandRegister />,
     },
+    {
+      path: "/dashboard",
+      element:
+      <>
+      <NavbarDashboard />
+      <Dashboard />
+      </> , 
+    }
   ]);
   return (
     <>
