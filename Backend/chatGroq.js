@@ -1,6 +1,7 @@
 const express = require('express');
 const Groq = require('groq-sdk');
 const router = express.Router();
+require('dotenv').config();
 
 // Fixed prompt for the chatbot
 const fixedPrompt = `You are an AI-powered chatbot for a Web3-based land allocation system. 
@@ -40,7 +41,7 @@ async function getGroqChatStream(userMessage, apiKey) {
 router.post("/chat", async (req, res) => {
   try {
     const { message } = req.body;
-    const groqApiKey = "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";
+    const groqApiKey = process.env.GROQ_API_KEY;
     if (!message) {
       return res.status(400).json({ success: false, error: "User prompt is required." });
     }
