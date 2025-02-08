@@ -91,7 +91,7 @@ const Dashboard = () => {
           {holdings.map((holding) => (
             <div 
               key={holding.id} 
-              className={`bg-white p-4 rounded-lg shadow-md transition-all duration-300 ${
+              className={`bg-white opacity-50 p-4 rounded-lg shadow-md transition-all duration-300 ${
                 expandedProperty === holding ? 'col-span-3' : ''
               }`}
               onClick={() => handlePropertyClick(holding)}
