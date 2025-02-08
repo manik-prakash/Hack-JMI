@@ -3,7 +3,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Home from "./components/Home";
 import Auth from "./components/Auth";
 import Navbar from "./components/Navbar";
-import LandRegister from "./components/LandRegister";
+import LandRegistrationForm from "./components/LandRegister";
 import Chatbot from "./components/Chatbot";
 import './App.css';
 import Dashboard from "./components/Dashboard";
