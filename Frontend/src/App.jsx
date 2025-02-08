@@ -7,8 +7,24 @@ import Navbar from "./components/Navbar";
 import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  const routes = createBrowserRouter([
+    {
+      path: "/",
+      element: 
+      <>
+        <Navbar/>
+        <Home/>
+      </>,
+    },
+    {
+      path: "/login",
+      element: <Login />,
+    },
+    {
+      path: "/auth",
+      element: <Auth />,
+    },
+  ]);
   return (
     <>
       <RouterProvider router={routes} />
