@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { NavLink } from "react-router-dom";
 import arrow_up from "../assets/arrow_up.png";
 import arrow_down from "../assets/arrow_down.png";
 
 
-const Navbar = () => {
+const NavbarDashboard = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -43,21 +43,16 @@ const Navbar = () => {
     <div className="flex justify-center items-center sticky top-5 z-10">
       <nav className="w-[65%] py-4 px-12 bg-[rgba(5,7,10,0.4)] backdrop-blur-3xl text-white border-2 border-[hsla(220, 20%, 25%, 0.6)] rounded-3xl">
         <div className="container mx-auto flex justify-between items-center">
-          <h1 className="text-xl font-bold">MyApp</h1>
+          <h1 className="text-xl font-bold">Decentraland</h1>
           <ul className="flex space-x-6 items-center justify-center">
             <li>
+              <NavLink to="/dashboard" className="hover:text-gray-200">
+                Dashboard
+              </NavLink>
+            </li>
+            <li>
               <NavLink to="/" className="hover:text-gray-200">
-                Home
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/about" className="hover:text-gray-200">
-                About Us
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/chat" className="hover:text-gray-200">
-                Chat-Bot
+                ChatBot
               </NavLink>
             </li>
             <li>
@@ -92,7 +87,7 @@ const Navbar = () => {
                   to="/signup"
                   className="text-black bg-white px-4 py-2 rounded-3xl"
                 >
-                  Sign Up
+                  Logout
                 </NavLink>
               )}
             </li>
@@ -103,4 +98,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default NavbarDashboard;
