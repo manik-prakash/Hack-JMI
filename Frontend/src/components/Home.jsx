@@ -1,5 +1,5 @@
 import React from "react";
-
+import { NavLink } from "react-router-dom";
 const Home = () => {
   return (
     <div className="text-white min-h-screen flex justify-center items-center gap-28">
@@ -23,9 +23,11 @@ const Home = () => {
               buying, selling, and managing real estate. 
             </div>
             <div className="flex gap-10">
+              <NavLink to="/landregister">
               <button className="text-lg bg-gradient-to-r from-green-400 to-blue-600 hover:from-green-500 hover:to-blue-700 text-white px-10 py-5 rounded-full shadow-lg transition-transform transform hover:scale-105">
-                Try Now
+                Register land
               </button>
+              </NavLink>
               <button className="text-lg bg-gradient-to-r from-green-400 to-blue-600 hover:from-green-500 hover:to-blue-700 text-white px-10 py-5 rounded-full shadow-lg transition-transform transform hover:scale-105">
                 Try Now
               </button>
