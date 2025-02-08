@@ -56,6 +56,11 @@ const Navbar = () => {
               </NavLink>
             </li>
             <li>
+              <NavLink to="/chat" className="hover:text-gray-200">
+                Chat-Bot
+              </NavLink>
+            </li>
+            <li>
               {currentUser ? (
                 <div className="relative flex items-center justify-center" ref={dropdownRef}>
                   <button
