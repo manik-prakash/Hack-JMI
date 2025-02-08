@@ -40,15 +40,15 @@ function Marketplace() {
   };
 
   return (
-    <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">Marketplace</h2>
+    <div className="p-4 mt-10">
+      <h2 className="text-4xl font-bold mb-4 text-white">Marketplace</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {listings.map((listing) => (
-          <div key={listing.id} className=" bg-white opacity-50 p-4 rounded-lg shadow-md backdrop-filter backdrop-blur-lg">
-            <h3 className="text-lg font-semibold">{listing.propertyName}</h3>
-            <p className="text-black">{listing.propertyAddress}</p>
-            <p className="text-black">Price: {listing.price} ETH</p>
-            <p className="text-black">Area: {listing.totalLandArea}</p>
+          <div key={listing.id} className="bg-gradient-to-br from-gray-800 to-gray-900 bg-opacity-70 p-6 rounded-2xl shadow-lg backdrop-blur-3xl border-2 border-gray-500">
+            <h3 className="text-white text-3xl font-semibold">{listing.propertyName}</h3>
+            <p className="text-white">{listing.propertyAddress}</p>
+            <p className="text-white">Price: {listing.price} ETH</p>
+            <p className="text-white">Area: {listing.totalLandArea}</p>
 
             {/* Expand Button */}
             <button
@@ -61,8 +61,8 @@ function Marketplace() {
             {/* Expanded Details */}
             {expandedId === listing.id && (
               <div className="mt-4">
-                <p>Postal Code: {listing.postalCode}</p>
-                <p>Owner: {listing.owner}</p>
+                <p className="text-white">Postal Code: {listing.postalCode}</p>
+                <p className="text-white">Owner: {listing.owner}</p>
                 <button
                   className="mt-2 bg-blue-900 text-white px-4 py-2 rounded"
                   onClick={() => handleBuy(listing.id, listing.price)}
