@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Home from "./components/Home";
-import Login from "./components/LogIn";
 import Auth from "./components/Auth";
 import Navbar from "./components/Navbar";
 import LandRegister from "./components/LandRegister";
+import Chatbot from "./components/Chatbot";
 import './App.css';
 import Dashboard from "./components/Dashboard";
 import NavbarDashboard from "./components/NavbarDashboard";
@@ -19,10 +19,6 @@ function App() {
         <Navbar/>
         <Home/>
       </>,
-    },
-    {
-      path: "/login",
-      element: <Login />,
     },
     {
       path: "/auth",
@@ -48,6 +44,10 @@ function App() {
       <Marketplace />
       </> , 
     }
+    {
+      path: "/chat",
+      element: <Chatbot />,
+    },
   ]);
   return (
     <>
