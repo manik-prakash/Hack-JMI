@@ -43,7 +43,7 @@ function App() {
       <NavbarDashboard />
       <Marketplace />
       </> , 
-    }
+    },
     {
       path: "/chat",
       element: <Chatbot />,
