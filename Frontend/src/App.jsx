@@ -5,9 +5,8 @@ import Auth from "./components/Auth";
 import Navbar from "./components/Navbar";
 import LandRegistrationForm from "./components/LandRegister";
 import Chatbot from "./components/Chatbot";
-import './App.css';
+import "./App.css";
 import Dashboard from "./components/Dashboard";
-import NavbarDashboard from "./components/NavbarDashboard";
 import Marketplace from "./components/MarketPlace";
 import NotFound from "./components/NotFound";
 
@@ -15,11 +14,12 @@ function App() {
   const routes = createBrowserRouter([
     {
       path: "/",
-      element: 
-      <>
-        <Navbar/>
-        <Home/>
-      </>,
+      element: (
+        <>
+          <Navbar />
+          <Home />
+        </>
+      ),
     },
     {
       path: "/auth",
@@ -31,23 +31,30 @@ function App() {
     },
     {
       path: "/dashboard",
-      element:
-      <>
-      <NavbarDashboard />
-      <Dashboard />
-      </> , 
+      element: (
+        <>
+          <Navbar />
+          <Dashboard />
+        </>
+      ),
     },
     {
       path: "/marketplace",
-      element:
-      <>
-      <NavbarDashboard />
-      <Marketplace />
-      </> , 
+      element: (
+        <>
+          <Navbar />
+          <Marketplace />
+        </>
+      ),
     },
     {
       path: "/chat",
-      element: <Chatbot />,
+      element: (
+        <>
+          <Navbar />
+          <Chatbot />
+        </>
+      ),
     },
     {
       path: "*",

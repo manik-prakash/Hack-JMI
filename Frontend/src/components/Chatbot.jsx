@@ -42,7 +42,7 @@ const ChatApp = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen p-4">
-      <div className="bg-gradient-to-br from-white/5 to-white/5 backdrop-blur-lg p-8 shadow-xl shadow-[#027af23b] border border-white/20 rounded-4xl w-[65vw] h-[90vh] flex flex-col">
+      <div className="bg-gradient-to-br from-white/5 to-white/5 backdrop-blur-lg p-8 shadow-xl shadow-[#027af23b] border border-white/20 rounded-4xl w-[65vw] h-[75vh] flex flex-col">
         <h1 className="text-4xl font-bold text-center text-white mb-4">
           WEB3 BASED LAND ALLOCATION CHATBOT
         </h1>
