@@ -71,35 +71,45 @@ const registerproperty = async (req,res) =>{
 
 const sellholding = async (req, res) => {
     const { propertyID, email } = req.body;
-
-    try{
-        // Find user and check if they own the property
-        const existingUser = await User.findOne({ email });
-        if (!existingUser) {
-            return res.status(404).json({ message: "User not found." });
-        }
-
-        const holding = existingUser.holdings.find(
-            holding => holding.propertyID.toString() === propertyID
-        );
-
-        if (!holding) {
-            return res.status(404).json({ message: "Property not found in user holdings." });
-        }
-
-        // Find property and update sale status
-        const property = await Property.findById(propertyID);
-        if (!property) {
-            return res.status(404).json({ message: "Property not found." });
-        }
-
-        property.sale = true;
-        await property.save();
-
-        res.status(200).json({ message: "Property put up for sale successfully", property });
-    }catch(error){
-        console.error(error);
-        res.status(500).json({ message: "Server error while selling property", error: error.message });
+  
+    // Validate input
+    if (!propertyID || !email) {
+      return res.status(400).json({ message: "Missing required fields: propertyID or email." });
+    }
+  
+    try {
+      // Find user and check if they own the property
+      const existingUser = await User.findOne({ email });
+      if (!existingUser) {
+        return res.status(404).json({ message: "User not found." });
+      }
+  
+      const holding = existingUser.holdings.find(
+        (holding) => holding.propertyID.toString() === propertyID
+      );
+      if (!holding) {
+        return res.status(404).json({ message: "Property not found in user holdings." });
+      }
+  
+      // Find property and update sale status
+      const property = await Property.findById(propertyID);
+      if (!property) {
+        return res.status(404).json({ message: "Property not found." });
+      }
+  
+      property.sale = true; // Mark property as for sale
+      await property.save();
+  
+      res.status(200).json({
+        message: "Property put up for sale successfully",
+        property,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        message: "Server error while selling property",
+        error: error.message,
+      });
     }
 };
 
