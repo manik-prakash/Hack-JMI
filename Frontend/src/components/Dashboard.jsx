@@ -98,7 +98,7 @@ const Dashboard = () => {
 
   const handleConfirmSale = () => {
     console.log(`Putting property ${selectedProperty.name} on sale for ${salePrice} ETH`);
-    // Add your sale logic here
+    
     handleCloseModal();
   };
 
@@ -148,7 +148,7 @@ const Dashboard = () => {
                           className="mt-2 bg-red-500 text-white px-4 py-2 rounded"
                           onClick={() => handleSaleClick(holding)}
                         >
-                          Sale this land
+                          Sell this land
                         </button>
                       </div>
                     ) : (
