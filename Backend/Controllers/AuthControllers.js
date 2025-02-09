@@ -5,74 +5,86 @@ const jwt = require("jsonwebtoken");
 const User = require("../Models/userModel");
 
 const signup = async (req, res) => {
-    const {username,email,password} = req.body;
+    const { username, email, password } = req.body;
 
     try {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.redirect("/login"); // Redirect to login page 
+            return res.redirect("/login");
         }
 
-        bcrypt.genSalt(process.env.SALT_ROUNDS, function(err, salt) {
-            bcrypt.hash(password,process.env.SALT, function(err, hash) {
-                if(err){
-                    console.log(err);
-                }
-                pass = hash;
-            });
-        });
+        // Hash password with bcrypt
+        const hashedPassword = await bcrypt.hash(password, 10); // 10 salt rounds
 
-        const token = jwt.sign(username, process.env.JWT_SECRET);
+        const token = jwt.sign(
+            { userId: username }, // Use a meaningful payload
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        );
 
         const user = new User({
-            name : username,
-            email : email,
-            password : pass,
+            name: username,
+            email,
+            password: hashedPassword, // Store hashed password
         });
 
-        const newuser = await User.register(user, password);
-        console.log("signup successful");
+        await user.save(); // Save user to database
+        console.log("Signup successful");
 
-        res.cookie('token', token);
-
-        res.json({ token });
+        // Send token in both cookie and response
+        res.cookie('token', token, { httpOnly: true });
+        res.status(201).json({ token });
         
     } catch (error) {
         console.error(error);
+        res.status(500).send("Internal Server Error");
     }
 };
 
 const login = async (req, res) => {
-    const {username , password} = req.body;
+    const { username , password } = req.body; // Fix parameter name
 
-    const user = User.find(u => u.email === email);
-    if (!user) {
-      res.redirect("/signup"); // Redirect to signup page
+    try {
+        const user = await User.findOne({ username });
+        if (!user) {
+            return res.redirect("/signup");
+        }
+
+        const validPassword = await bcrypt.compare(password, user.password);
+        if (!validPassword) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        const token = jwt.sign(
+            { userId: user.id, email: user.email },
+            process.env.JWT_SECRET, // Correct variable
+            { expiresIn: '24h' }
+        );
+
+        res.cookie('token', token, { httpOnly: true });
+        res.json({ message: 'Logged in successfully', token });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Internal Server Error");
     }
+};
 
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+const validateAuth = async (req, res) => {
+    try {
+        const token = req.cookies.token;
+        if (!token) return res.status(401).json({ isAuthenticated: false });
+
+        jwt.verify(token, process.env.JWT_SECRET);
+        res.status(200).json({ isAuthenticated: true });
+    } catch (error) {
+        res.status(401).json({ isAuthenticated: false });
     }
-
-    // Generate JWT token
-    const token = jwt.sign(
-        { userId: user.id, email: user.email },
-        JWT_SECRET,
-        { expiresIn: '24h' }
-    );
-
-    res.cookie('token', token);
-  
-    res.json({
-        message: 'Logged in successfully' ,
-        token
-    });
 };
 
 module.exports = {
     signup,
-    login
+    login,
+    validateAuth,
 };
 
 

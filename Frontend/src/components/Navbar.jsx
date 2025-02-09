@@ -10,12 +10,6 @@ const Navbar = () => {
   const dropdownRef = useRef(null);
   const [arrow, setArrow] = useState(arrow_down)
 
-  useEffect(() => {
-    setTimeout(() => {
-      setCurrentUser({ username: "JohnDoe" });
-    }, 1000);
-  }, []);
-
   const handleDropdownClick = () => {
     setDropdownOpen((prev) => !prev);
     setArrow(arrow === arrow_down ? arrow_up : arrow_down)
@@ -53,11 +47,6 @@ const Navbar = () => {
             <li>
               <NavLink to="/about" className="hover:text-gray-200">
                 About Us
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/chat" className="hover:text-gray-200">
-                Chat-Bot
               </NavLink>
             </li>
             <li>

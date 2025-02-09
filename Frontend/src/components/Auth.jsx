@@ -21,7 +21,7 @@ export default function AuthPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const url = isLogin ? "/user/login" : "/user/signup";
+      const url = isLogin ? "http://localhost:5000/auth/login" : "http://localhost:5000/auth/signup";
       const { data } = await axios.post(url, formData, {
         withCredentials: true,
       });
