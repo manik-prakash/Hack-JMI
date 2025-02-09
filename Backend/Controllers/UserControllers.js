@@ -1,5 +1,5 @@
-const User = require("../Models/User");
-const Property = require("../Models/Property");
+const User = require("../Models/userModel");
+const Property = require("../Models/propertyModel");
 
 const getholdings = async (req, res) => {
     const { email } = req.body;
