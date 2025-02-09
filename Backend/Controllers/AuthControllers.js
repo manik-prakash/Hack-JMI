@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
 const User = require("../Models/userModel");
 
 const signup = async (req, res) => {
@@ -24,7 +26,7 @@ const signup = async (req, res) => {
 
         const user = new User({
             name: username,
-            email,
+            email: email,
             password: hashedPassword, // Store hashed password
         });
 
@@ -71,13 +73,24 @@ const login = async (req, res) => {
 
 const validateAuth = async (req, res) => {
     try {
-        const token = req.cookies.token;
-        if (!token) return res.status(401).json({ isAuthenticated: false });
+        const token = req.cookies?.token; // Ensure token exists in cookies
 
-        jwt.verify(token, process.env.JWT_SECRET);
-        res.status(200).json({ isAuthenticated: true });
+        if (!token) {
+            return res.status(401).json({ isAuthenticated: false, message: "No token provided" });
+        }
+
+        // Verify JWT Token
+        jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+            if (err) {
+                return res.status(401).json({ isAuthenticated: false, message: "Invalid or expired token" });
+            }
+
+            res.status(200).json({ isAuthenticated: true, userId: decoded.userId });
+        });
+
     } catch (error) {
-        res.status(401).json({ isAuthenticated: false });
+        console.error("Token validation error:", error.message);
+        res.status(500).json({ isAuthenticated: false, message: "Server error" });
     }
 };
 
