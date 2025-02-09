@@ -2,6 +2,9 @@ const mongoose = require('mongoose');
 const {Schema} = mongoose.Schema;
 
 const propertySchema = new Schema({
+    lanId :{
+        type : String
+    },
     name: {
         type: String,
         required: true

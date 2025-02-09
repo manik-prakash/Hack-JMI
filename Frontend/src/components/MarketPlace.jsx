@@ -1,42 +1,93 @@
-import React from "react";
+import { useEffect, useState } from "react";
+import { ethers } from "ethers"; // Install ethers.js: npm install ethers
+import axios from "axios";
+
 
 function Marketplace() {
-  // Hardcoded data for lands listed for sale
-  const listings = [
-    {
-      id: 1,
-      owner: "0x1234567890abcdef",
-      propertyAddress: "123 Main Street",
-      price: "50", // In ETH
-      totalLandArea: "1000 sqm",
-      postalCode: "12345",
-      propertyName: "Sunny Acres",
-    },
-    {
-      id: 2,
-      owner: "0xabcdef1234567890",
-      propertyAddress: "456 Elm Street",
-      price: "75", // In ETH
-      totalLandArea: "1500 sqm",
-      postalCode: "67890",
-      propertyName: "Green Valley",
-    },
-    {
-      id: 3,
-      owner: "0xdeadbeefcafe1234",
-      propertyAddress: "789 Oak Avenue",
-      price: "100", // In ETH
-      totalLandArea: "2000 sqm",
-      postalCode: "54321",
-      propertyName: "Lakeview Heights",
-    },
-  ];
-//   const [listings, setListings] = React.useState([]);
-  const [expandedId, setExpandedId] = React.useState(null);
+  const [listings, setListings] = useState([]);
+  const [expandedId, setExpandedId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false); // Track authentication status
 
-  const handleBuy = (landId, price) => {
-    alert(`Buying land ID ${landId} for ${price} ETH`);
-    // Replace this with actual smart contract interaction later
+  // Replace these with your actual values
+  const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS; // Smart contract address
+  const ABI = import.meta.env.VITE_ABI; // Smart contract ABI
+
+  // Simulate authentication check (replace this with your actual auth logic)
+  useEffect(() => {
+    const checkAuth = async () => {
+        try {
+            const response = await fetch('http://localhost:3000/auth/validate', {
+                credentials: 'include' // Required for cookies
+            });
+            const data = await response.json();
+            setIsAuthenticated(data.isAuthenticated);
+        } catch (error) {
+            console.error("Auth check failed:", error);
+            setIsAuthenticated(false);
+        }
+    };
+    checkAuth();
+  }, []);
+
+  // Fetch data from the backend API
+  useEffect(() => {
+    const fetchListings = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/user/allholdings");
+        if (!response.ok) {
+          throw new Error("Failed to fetch properties");
+        }
+        const data = await response.json();
+        setListings(data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching properties:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchListings();
+  }, []);
+
+  // Function to handle buying land
+  const handleBuy = async (landId, price) => {
+    if (!isAuthenticated) {
+      alert("You need to log in to buy land.");
+      window.location.href = "/Auth"; // Redirect to login page
+      return;
+    }
+
+    try {
+      // Connect to Ethereum provider (MetaMask)
+      if (typeof window.ethereum === "undefined") {
+        alert("Please install MetaMask to proceed.");
+        return;
+      }
+
+      await window.ethereum.request({ method: "eth_requestAccounts" }); // Request account access
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+
+      // Connect to the smart contract
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+
+      // Convert price to Wei (Ethereum's smallest unit)
+      const priceInWei = ethers.utils.parseEther(price.toString());
+
+      // Call the buyLand function
+      const tx = await contract.buyLand(landId, { value: priceInWei });
+      console.log("Transaction sent:", tx.hash);
+
+      // Wait for the transaction to be mined
+      await tx.wait();
+      console.log("Transaction confirmed:", tx.hash);
+      alert(`Successfully bought land ID ${landId} for ${price} ETH`);
+
+    } catch (error) {
+      console.error("Error buying land:", error);
+      alert("Failed to buy land. Please try again.");
+    }
   };
 
   return (
