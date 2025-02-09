@@ -9,6 +9,28 @@ const Navbar = () => {
   const dropdownRef = useRef(null);
   const [arrow, setArrow] = useState(arrow_down)
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/auth/validate', {
+          credentials: 'include' 
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setCurrentUser(data.user);
+        } else {
+          setCurrentUser(null);
+        }
+      } catch (error) {
+        console.error("Auth check failed:", error);
+        setCurrentUser(null);
+      }
+    };
+  
+    checkAuth();
+  }, []);
+
   const handleDropdownClick = () => {
     setDropdownOpen((prev) => !prev);
     setArrow(arrow === arrow_down ? arrow_up : arrow_down);
@@ -46,11 +68,11 @@ const Navbar = () => {
               </li>
             )}
             {!currentUser && (
-            <li>
-              <NavLink to="/about" className="hover:text-gray-200">
-                About Us
-              </NavLink>
-            </li>
+              <li>
+                <NavLink to="/about" className="hover:text-gray-200">
+                  About Us
+                </NavLink>
+              </li>
             )}
             <li>
               <NavLink to="/chat" className="hover:text-gray-200">
