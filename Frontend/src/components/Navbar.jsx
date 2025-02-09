@@ -7,13 +7,7 @@ const Navbar = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const [arrow, setArrow] = useState(arrow_down);
-
-  useEffect(() => {
-    setTimeout(() => {
-      setCurrentUser({ username: "JohnDoe" });
-    }, 1000);
-  }, []);
+  const [arrow, setArrow] = useState(arrow_down)
 
   const handleDropdownClick = () => {
     setDropdownOpen((prev) => !prev);
