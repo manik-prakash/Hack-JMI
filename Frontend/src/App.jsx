@@ -9,6 +9,7 @@ import './App.css';
 import Dashboard from "./components/Dashboard";
 import NavbarDashboard from "./components/NavbarDashboard";
 import Marketplace from "./components/MarketPlace";
+import NotFound from "./components/NotFound";
 
 function App() {
   const routes = createBrowserRouter([
@@ -47,6 +48,10 @@ function App() {
     {
       path: "/chat",
       element: <Chatbot />,
+    },
+    {
+      path: "*",
+      element: <NotFound />,
     },
   ]);
   return (
